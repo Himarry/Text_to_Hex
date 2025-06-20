@@ -1,45 +1,51 @@
 import tkinter as tk
 from tkinter import ttk
 
-# 文字列を16進数に変換する関数
+# テキストを16進数に変換する関数
 def text_to_hex(text):
-    # 各文字をUTF-8でエンコードし、バイトごとに16進数2桁大文字で表示
+    # 日本語もいけるようにUTF-8でエンコードする。
+    # バイトごとにスペースで区切って見やすくする。
     hex_bytes = text.encode('utf-8')
     return ' '.join(f'{b:02X}' for b in hex_bytes)
 
-# 16進数を文字列に変換する関数
+# 16進数をテキストに戻す関数
 def hex_to_text(hex_str):
     try:
-        # 空白区切りで16進数を分割し、バイト配列に変換
+        # スペースで区切られた16進数をバイトに戻して、UTF-8でデコード。
         bytes_arr = bytes(int(b, 16) for b in hex_str.strip().split())
         return bytes_arr.decode('utf-8')
     except Exception:
+        # 変な値が入力されたらエラーを返す。
         return '変換エラー'
 
-# ボタンが押されたときの処理
+# 「変換」ボタンが押されたときの処理
 def convert():
     input_text = input_box.get()
+    # どっちのモードが選ばれてるかで処理を分岐させる。
     if mode_var.get() == 'text2hex':
         hex_result = text_to_hex(input_text)
+        # 結果を入れるために一時的に書き込み可能にする。
         output_box.config(state='normal')
         output_box.delete(0, tk.END)
         output_box.insert(0, hex_result)
-        output_box.config(state='readonly')
+        output_box.config(state='readonly') # 終わったら読み取り専用に戻す。
     else:
         text_result = hex_to_text(input_text)
+        # こっちも同じように結果をセットする。
         output_box.config(state='normal')
         output_box.delete(0, tk.END)
         output_box.insert(0, text_result)
         output_box.config(state='readonly')
 
+# --- ここからGUIの作成 ---
 root = tk.Tk()
-root.title('文字列→16進数 変換ツール')
+root.title('文字列⇔16進数 変換ツール')
 root.geometry('400x150')
 
 mainframe = ttk.Frame(root, padding='10')
 mainframe.pack(fill=tk.BOTH, expand=True)
 
-input_label = ttk.Label(mainframe, text='文字列:')
+input_label = ttk.Label(mainframe, text='入力:')
 input_label.grid(row=0, column=0, sticky=tk.W)
 input_box = ttk.Entry(mainframe, width=40)
 input_box.grid(row=0, column=1, padx=5, pady=5)
